@@ -155,10 +155,16 @@ public class ModulesDump {
         Node n = document.getElementsByTagName("dependencies").item(0);
         if (n != null) {
             NodeList deps = n.getChildNodes();
+            Set<String> seenDep = new HashSet<>();
             for (int i = 0; i < deps.getLength(); i++) {
                 if (deps.item(i).getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) deps.item(i);
                     String mod = element.getAttribute("name");
+                    if(seenDep.contains(mod)) {
+                        System.out.println("WARNING: Module " + module + " contains redundant dependency to " + mod);
+                        continue;
+                    }
+                    seenDep.add(mod);
                     if (!element.hasAttribute("optional")) {
                         getDependencies(modulePath, mod, seen, dir, currentPath + "/" + module,
                                 paths, includeOptional, passives, optionals);
